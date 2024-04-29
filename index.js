@@ -9,12 +9,13 @@ const stopBtn = document.getElementById('stop');
 const resetBtn = document.getElementById('reset');
 const ticks = document.getElementById('ticks')
 const seconds = document.getElementById('seconds')
+const tempo = document.getElementById('bpm');
+const beatsPerMeasure = document.getElementById('beatsPerMeasure');
+const tempoDisplay = document.getElementById('tempoDisplay');
 
-// USER SETTINGS
-let tempo = 60; // bpm
-let beatsPerMeasure = 4;
 
-const intervalTime = (1000 * 60) / tempo; // milliseconds per tick
+let intervalTime = (1000 * 60) / tempo.value; // milliseconds per tick
+
 
 // Initialise variables
 let metronomeInterval = null;
@@ -24,6 +25,19 @@ let beatCount = 1
 let elapsedSeconds = 0
 let pausedTime = initialTime
 
+tempo.addEventListener('input', function() {
+  tempoDisplay.textContent = tempo.value;
+  intervalTime = (1000 * 60) / tempo.value; // milliseconds per tick
+  updateMetronomeInterval()
+});
+
+function updateMetronomeInterval() {
+  if (metronomeInterval !== null) {
+    clearInterval(metronomeInterval);
+    metronomeInterval = setInterval(tick, intervalTime);
+  }
+}
+
 function tick() {
   const currentTime = performance.now();
   if (currentTime < initialTime + (elapsedTicks * intervalTime)) return
@@ -31,11 +45,11 @@ function tick() {
   elapsedTicks++;
   
   if (beatCount === 1) {
-    // audio1.currentTime = 0;
+    audio1.currentTime = 0;
     audio1.preload = 'auto';
     audio1.play()
   } else {
-    // audio2.currentTime = 0;
+    audio2.currentTime = 0;
     audio2.preload = 'auto';
     audio2.play()
   }
@@ -48,7 +62,7 @@ function tick() {
     seconds.textContent = elapsedSeconds;
   }
 
-  beatCount === beatsPerMeasure ? beatCount = 1 : beatCount++;
+  beatCount === Number(beatsPerMeasure.value) ? beatCount = 1 : beatCount++;
 }
 
 function startMetronome() {
